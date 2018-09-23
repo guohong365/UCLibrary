@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libini", "libini\libini.vcxproj", "{436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IniTest", "IniTest\IniTest.vcxproj", "{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}"
+	ProjectSection(ProjectDependencies) = postProject
+		{436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D} = {436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +18,10 @@ Global
 		{436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D}.Debug|Win32.Build.0 = Debug|Win32
 		{436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D}.Release|Win32.ActiveCfg = Release|Win32
 		{436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D}.Release|Win32.Build.0 = Release|Win32
+		{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}.Debug|Win32.ActiveCfg = Debug|Win32
+		{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}.Debug|Win32.Build.0 = Debug|Win32
+		{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}.Release|Win32.ActiveCfg = Release|Win32
+		{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -111,7 +111,7 @@ struct LIB_UC_API ConfigComment: ConfigItem
  *@note 使用注意:在工程设置中要选择：\n
  *       Project --setting --c/c++ --c++ language --Enable Run_Time information(RTTI)      
  */
-class LIB_UC_API CIniFile
+class LIB_UC_API IniFile
 {
 protected:
 	void removeAll()
@@ -342,7 +342,7 @@ public:
 	* @return 节的数量
 	*/
 	long GetSectionNum() ;
-	~CIniFile()
+	~IniFile()
 	{
 		std::for_each(_iniItems.begin(), _iniItems.end(), DeletePtr());
 		_iniItems.clear();

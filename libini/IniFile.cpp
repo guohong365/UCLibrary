@@ -5,7 +5,7 @@
 #define LEN_ARGB_COLOR_VALUE 9
 #define LEN_RGB_COLOR_VALUE 7
 
-int CIniFile::isSection(const TCHAR *buf)
+int IniFile::isSection(const TCHAR *buf)
 {
 	if(buf[0]==_T('['))
 	{
@@ -17,13 +17,13 @@ int CIniFile::isSection(const TCHAR *buf)
 	}
 	return 0;
 }
-int CIniFile::isComment(const TCHAR *buf)
+int IniFile::isComment(const TCHAR *buf)
 {
 	if(buf[0]==_T(';'))
 		return 1;
 	return 0;
 }
-void CIniFile::phaseSection(const TCHAR *buf, ConfigSection &section) const
+void IniFile::phaseSection(const TCHAR *buf, ConfigSection &section) const
 {
 	const TCHAR *end=buf;
 	int found=0;
@@ -48,7 +48,7 @@ void CIniFile::phaseSection(const TCHAR *buf, ConfigSection &section) const
 	}
 }
 
-long CIniFile::phaseItem(const TCHAR* buf, ConfigItemImpl &item) const
+long IniFile::phaseItem(const TCHAR* buf, ConfigItemImpl &item) const
 {
 	const TCHAR* end=buf;
 	int found=0;
@@ -90,7 +90,7 @@ long CIniFile::phaseItem(const TCHAR* buf, ConfigItemImpl &item) const
 	return 0;
 }
 
-ConfigSection *CIniFile::findSection(const TCHAR *sectionName)
+ConfigSection *IniFile::findSection(const TCHAR *sectionName)
 {
 	for(size_t i = 0; i<_iniItems.size(); i++)
 	{
@@ -104,7 +104,7 @@ ConfigSection *CIniFile::findSection(const TCHAR *sectionName)
 	return nullptr;
 }
 
-const TCHAR* CIniFile::GetSectionComment(const TCHAR *section)
+const TCHAR* IniFile::GetSectionComment(const TCHAR *section)
 {
 	ConfigSection *pSection=findSection(section);
 	if(pSection)
@@ -114,7 +114,7 @@ const TCHAR* CIniFile::GetSectionComment(const TCHAR *section)
 	return _T("");
 }
 
-const TCHAR* CIniFile::GetItemComment(const TCHAR *section, const TCHAR *itemName)
+const TCHAR* IniFile::GetItemComment(const TCHAR *section, const TCHAR *itemName)
 {
 	ConfigItemImpl *item=findItem(section, itemName);
 	if(item)
@@ -123,7 +123,7 @@ const TCHAR* CIniFile::GetItemComment(const TCHAR *section, const TCHAR *itemNam
 	}
 	return _T("");
 }
-long CIniFile::OpenIniFile(const TCHAR *IniFileName)
+long IniFile::OpenIniFile(const TCHAR *IniFileName)
 {
 	
 	_tsetlocale(0, _T("chs"));
@@ -197,7 +197,7 @@ long CIniFile::OpenIniFile(const TCHAR *IniFileName)
 	return 0;
 }
 
-ConfigItemImpl *CIniFile::findItem(const TCHAR *Section, const TCHAR *ItemName)
+ConfigItemImpl *IniFile::findItem(const TCHAR *Section, const TCHAR *ItemName)
 {
 	ConfigSection* section = findSection(Section);
 	if(section)
@@ -215,7 +215,7 @@ ConfigItemImpl *CIniFile::findItem(const TCHAR *Section, const TCHAR *ItemName)
 	}
 	return nullptr;
 }
-TCHAR CIniFile::GetConfigChar(const TCHAR *section, const TCHAR *itemName, TCHAR defaultV)
+TCHAR IniFile::GetConfigChar(const TCHAR *section, const TCHAR *itemName, TCHAR defaultV)
 {
 	ConfigItemImpl *item=findItem(section, itemName);
 	if(item && item->Value[0]!=0)
@@ -225,7 +225,7 @@ TCHAR CIniFile::GetConfigChar(const TCHAR *section, const TCHAR *itemName, TCHAR
 	return defaultV;
 }
 
-long CIniFile::GetConfigInt(const TCHAR *section, const TCHAR *itemName, long defaultV)
+long IniFile::GetConfigInt(const TCHAR *section, const TCHAR *itemName, long defaultV)
 {
 	ConfigItemImpl *item=findItem(section, itemName);
 	if(item && item->Value[0]!=0 )
@@ -235,7 +235,7 @@ long CIniFile::GetConfigInt(const TCHAR *section, const TCHAR *itemName, long de
 	return defaultV;
 }
 
-const TCHAR *CIniFile::GetConfigString(const TCHAR *section, const TCHAR *itemName, const TCHAR *defaultV, TCHAR *buffer, long bufferLen)
+const TCHAR *IniFile::GetConfigString(const TCHAR *section, const TCHAR *itemName, const TCHAR *defaultV, TCHAR *buffer, long bufferLen)
 {
 	ConfigItemImpl* pConfig = findItem(section, itemName);
 	if(pConfig && pConfig->Value[0]!=0)
@@ -255,7 +255,7 @@ const TCHAR *CIniFile::GetConfigString(const TCHAR *section, const TCHAR *itemNa
 	return defaultV;
 }
 
-double CIniFile::GetConfigDouble(const TCHAR *section, const TCHAR *itemName, double defaultV)
+double IniFile::GetConfigDouble(const TCHAR *section, const TCHAR *itemName, double defaultV)
 {
 	ConfigItemImpl* pConfig = findItem(section, itemName);
 	if(pConfig && pConfig->Value[0]!=0)
@@ -313,7 +313,7 @@ unsigned int parseColor(const TCHAR* buffer, unsigned int defaultV)
 	if(!parseHexChar(buffer + index + 4, b)) return defaultV;
 	return (a << 24)|(r << 16)|(g << 8)|b;
 }
-unsigned long CIniFile::GetConfigColor(const TCHAR* section, const TCHAR* itemName, unsigned long defaultV)
+unsigned long IniFile::GetConfigColor(const TCHAR* section, const TCHAR* itemName, unsigned long defaultV)
 {
 	ConfigItemImpl*pConfig=findItem(section, itemName);
 	if(pConfig && pConfig->Value[0]!=0)
@@ -323,7 +323,7 @@ unsigned long CIniFile::GetConfigColor(const TCHAR* section, const TCHAR* itemNa
 	return defaultV;
 }
 
-long CIniFile::GetConfigSection(TCHAR *buffer, long bufferLen)
+long IniFile::GetConfigSection(TCHAR *buffer, long bufferLen)
 {
 	ConfigSection *section;
 	TCHAR *p;
@@ -368,7 +368,7 @@ long CIniFile::GetConfigSection(TCHAR *buffer, long bufferLen)
 	*p=0;
 	return len+1;
 }
-long CIniFile::GetConfigItem(const TCHAR *section, TCHAR *buffer, long bufferLen)
+long IniFile::GetConfigItem(const TCHAR *section, TCHAR *buffer, long bufferLen)
 {
 	ConfigItemImpl* item;
 	TCHAR *p;
@@ -422,7 +422,7 @@ long CIniFile::GetConfigItem(const TCHAR *section, TCHAR *buffer, long bufferLen
 	return len+1;
 }
 
-long CIniFile::AddConfig(const TCHAR*section, const TCHAR*itemName, const TCHAR *value)
+long IniFile::AddConfig(const TCHAR*section, const TCHAR*itemName, const TCHAR *value)
 {
 	if(section== nullptr ||section[0]==0)
 		return -2;
@@ -445,7 +445,7 @@ long CIniFile::AddConfig(const TCHAR*section, const TCHAR*itemName, const TCHAR 
 	return 0;
 }
 
-long CIniFile::ModifyConfig(const TCHAR*section, const TCHAR*itemName, const TCHAR *newValue)
+long IniFile::ModifyConfig(const TCHAR*section, const TCHAR*itemName, const TCHAR *newValue)
 {
 	ConfigItemImpl* pConfig = findItem(section, itemName);
 	if(pConfig)
@@ -456,7 +456,7 @@ long CIniFile::ModifyConfig(const TCHAR*section, const TCHAR*itemName, const TCH
 	return AddConfig(section, itemName, newValue);
 }
 
-long CIniFile::DeleteConfigItem(const TCHAR* section, const TCHAR *itemName)
+long IniFile::DeleteConfigItem(const TCHAR* section, const TCHAR *itemName)
 {
 	DumpIni(stdout);
 	ConfigSection* sec = findSection(section);
@@ -478,7 +478,7 @@ long CIniFile::DeleteConfigItem(const TCHAR* section, const TCHAR *itemName)
 	return -1;    
 }
 
-long CIniFile::DeleteConfigSection(const TCHAR *section)
+long IniFile::DeleteConfigSection(const TCHAR *section)
 {
 	const size_t count = _iniItems.size();
 	for(size_t i = count - 1; i>=0; i--)
@@ -494,7 +494,7 @@ long CIniFile::DeleteConfigSection(const TCHAR *section)
 	return 0;
 }
 
-long CIniFile::WriteIniFile(const TCHAR*IniFileName)
+long IniFile::WriteIniFile(const TCHAR*IniFileName)
 {
 	FILE *fp;
 	if(_tfopen_s(&fp, IniFileName, _T("w"))==0)
@@ -506,12 +506,12 @@ long CIniFile::WriteIniFile(const TCHAR*IniFileName)
 	return -1;
 }
 
-void CIniFile::CloseIniFile()
+void IniFile::CloseIniFile()
 {
 	removeAll();
 }
 
-void CIniFile::DumpIni(FILE *fp)
+void IniFile::DumpIni(FILE *fp)
 {
 	const size_t count = _iniItems.size();
 	for(size_t i = 0; i<count; i++)
@@ -519,7 +519,7 @@ void CIniFile::DumpIni(FILE *fp)
 		_iniItems[i]->Dump(fp);
 	}
 }
-long CIniFile::GetSectionNum()
+long IniFile::GetSectionNum()
 {
 	size_t count=0;
 	const size_t lineCount = _iniItems.size();
