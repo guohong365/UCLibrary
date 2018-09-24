@@ -2,6 +2,7 @@
 #include <utility.h>
 #include <time.h>
 #include <clocale>
+#include <tchar.h>
 #define BUFFER_LEN 1024
 
 TCHAR *UpperString(TCHAR *str)
@@ -286,7 +287,7 @@ bool HEXString2Bin(const char * str, BYTE * bin, size_t size)
 }
 void genRandomHEXString(char * pwd, size_t length)
 {
-    srand(time(nullptr));
+    srand(unsigned int(time(nullptr)));
     for(size_t i=0; i <length -1; i++)
     {
         int val= rand()%16;

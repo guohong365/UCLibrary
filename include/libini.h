@@ -3,6 +3,8 @@
 
 #include <libUC.h>
 #include <tchar.h>
+#include <IniFile.h>
+#include <utility.h>
 #ifndef LIB_UC_EXPORTS
 
 #pragma comment(lib, "libini" _UC_PLATFORM ".lib")

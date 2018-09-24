@@ -3,7 +3,7 @@
 */
 #ifndef __INI_FILE__
 #define __INI_FILE__
-#include <libini.h>
+#include <libUC.h>
 
 #include <stdio.h>
 #include <vector>

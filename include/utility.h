@@ -3,8 +3,7 @@
 */
 #ifndef __TRANS_UTILITY__
 #define __TRANS_UTILITY__
-#include <libini.h>
-
+#include "libUC.h"
 
 /**将字符串转换为大写
 * 

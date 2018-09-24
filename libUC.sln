@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IniTest", "IniTest\IniTest.
 		{436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D} = {436FA6FA-C1FE-4ED1-BE94-4ABED2C35E8D}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libUI", "libUI\libUI.vcxproj", "{8B33F638-2DE4-43B1-A656-32CCF0B0FDC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -22,6 +24,10 @@ Global
 		{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}.Debug|Win32.Build.0 = Debug|Win32
 		{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}.Release|Win32.ActiveCfg = Release|Win32
 		{13BCD29F-7B6A-4F37-AA1B-21953B6D1894}.Release|Win32.Build.0 = Release|Win32
+		{8B33F638-2DE4-43B1-A656-32CCF0B0FDC6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8B33F638-2DE4-43B1-A656-32CCF0B0FDC6}.Debug|Win32.Build.0 = Debug|Win32
+		{8B33F638-2DE4-43B1-A656-32CCF0B0FDC6}.Release|Win32.ActiveCfg = Release|Win32
+		{8B33F638-2DE4-43B1-A656-32CCF0B0FDC6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
