@@ -71,5 +71,10 @@ LIB_UC_API void DecompressBis(unsigned char* mapBuffer,const unsigned char* buff
 LIB_UC_API void CompressBits(unsigned char * buffer, const unsigned char * mapBuffer, size_t bits, size_t count);
 LIB_UC_API void ReorderBytes(unsigned char * outBuffer,const unsigned char * inBuffer, unsigned char * mapBuffer, size_t count);
 LIB_UC_API void RestoreBytesOrder(unsigned char * outBuffer,const unsigned char * inBuffer, unsigned char * mapBuffer, size_t count);
+LIB_UC_API unsigned short RevertUInt16(unsigned short input);
+LIB_UC_API short RevertInt16(short input);
+LIB_UC_API unsigned long RevertUInt32(unsigned long input);
+LIB_UC_API long RevertInt32(long input);
+
 #endif
 /** @} */

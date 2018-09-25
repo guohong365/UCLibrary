@@ -290,7 +290,7 @@ void genRandomHEXString(char * pwd, size_t length)
     srand(unsigned int(time(nullptr)));
     for(size_t i=0; i <length -1; i++)
     {
-        int val= rand()%16;
+	    const int val= rand()%16;
         if(val <=0)
         {
             pwd[i]= val + '0';
@@ -563,4 +563,36 @@ void RestoreBytesOrder(unsigned char * outBuffer,const unsigned char * inBuffer,
 	{
 		outBuffer[mapBuffer[i]]=inBuffer[i];
 	}
+}
+
+unsigned short RevertUInt16(unsigned short input)
+{
+	unsigned short output;
+	unsigned char * p0=reinterpret_cast<unsigned char*>(&input);
+	unsigned char * p1=reinterpret_cast<unsigned char*>(&output);
+	p1[0]=p0[1];
+	p1[1]=p0[0];
+	return output;
+}
+
+short RevertInt16(short input)
+{
+	return RevertUInt16(input);
+}
+
+unsigned long RevertUInt32(unsigned long input)
+{
+	unsigned long output;
+	unsigned char * p0=reinterpret_cast<unsigned char*>(&input);
+	unsigned char * p1=reinterpret_cast<unsigned char*>(&output);
+	p1[0]=p0[3];
+	p1[1]=p0[2];
+	p1[2]=p0[1];
+	p1[3]=p0[0];
+	return output;
+}
+
+long RevertInt32(long input)
+{
+	return RevertUInt32(input);
 }
