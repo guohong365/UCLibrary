@@ -45,74 +45,122 @@ UICoordinateHelper::UICoordinateHelper(HDC hdc)
 	VerticalLmPerDeviceUnit = static_cast<double>(25.4) /VerticalSize * Separate;   //0.1mm per pixel align y
 }
 
-int UICoordinateHelper::DPtoLP(POINT* pPoints, const int count, const int scale/*=100*/ ) const
+void UICoordinateHelper::DPtoLP(POINT* pPoints, const int count, const int scale/*=100*/ ) const
 {
-	int i;
-	for(i =0; i< count; i++)
+	for(int i = 0; i< count; i++)
 	{
 		pPoints[i].x=static_cast<int>(HorizontalLmPerDeviceUnit * pPoints[i].x / scale * 100); 
 		pPoints[i].y=static_cast<int>(VerticalLmPerDeviceUnit * pPoints[i].y / scale * 100);
 	}
-	return i;
 }
 
-int UICoordinateHelper::DPtoLP(RECT* pRects, const int count, const int scale/*=100*/) const
+void UICoordinateHelper::DPtoLP(Gdiplus::Point* pPoints, int count, int scale) const
 {
-	int i;
-	for(i =0; i< count; i++)
+	for(int i = 0; i< count; i++)
+	{
+		pPoints[i].X=static_cast<int>(HorizontalLmPerDeviceUnit * pPoints[i].X / scale * 100); 
+		pPoints[i].Y=static_cast<int>(VerticalLmPerDeviceUnit * pPoints[i].Y / scale * 100);
+	}
+}
+
+void UICoordinateHelper::DPtoLP(RECT* pRects, const int count, const int scale/*=100*/) const
+{
+	for(int i = 0; i< count; i++)
 	{
 		pRects[i].left= static_cast<int>(HorizontalLmPerDeviceUnit * pRects[i].left / scale * 100); 
 		pRects[i].right= static_cast<int>(HorizontalLmPerDeviceUnit * pRects[i].right / scale * 100); 
 		pRects[i].top= static_cast<int>(VerticalLmPerDeviceUnit * pRects[i].top / scale * 100);
 		pRects[i].bottom= static_cast<int>(VerticalLmPerDeviceUnit * pRects[i].bottom / scale * 100);
 	}
-	return i;
 }
 
-int UICoordinateHelper::DPtoLP( SIZE* pSize, int count, int scale/*=100*/ ) const
+void UICoordinateHelper::DPtoLP(Gdiplus::Rect* pRects, int count, int scale) const
 {
-	int i;
-	for(i =0; i< count; i++)
+	for(int i = 0; i< count; i++)
+	{
+		pRects[i].X= static_cast<int>(HorizontalLmPerDeviceUnit * pRects[i].X / scale * 100); 
+		pRects[i].Width= static_cast<int>(HorizontalLmPerDeviceUnit * pRects[i].Width / scale * 100); 
+		pRects[i].Y= static_cast<int>(VerticalLmPerDeviceUnit * pRects[i].Y / scale * 100);
+		pRects[i].Height= static_cast<int>(VerticalLmPerDeviceUnit * pRects[i].Height / scale * 100);
+	}
+}
+
+void UICoordinateHelper::DPtoLP( SIZE* pSize, int count, int scale/*=100*/ ) const
+{
+	for(int i = 0; i< count; i++)
 	{
 		pSize[i].cx= static_cast<int>(HorizontalLmPerDeviceUnit * pSize[i].cx / scale * 100); 
 		pSize[i].cy= static_cast<int>(VerticalLmPerDeviceUnit * pSize[i].cy / scale * 100);
 	}
-	return i;
-
 }
-int UICoordinateHelper::LPtoDP( RECT* pRects, int count, int scale/*=100*/ ) const
+
+void UICoordinateHelper::DPtoLP(Gdiplus::Size* pSize, int count, int scale) const
 {
-	int i;
-	for(i =0; i< count; i++)
+	for(int i = 0; i< count; i++)
+	{
+		pSize[i].Width= static_cast<int>(HorizontalLmPerDeviceUnit * pSize[i].Width / scale * 100); 
+		pSize[i].Height= static_cast<int>(VerticalLmPerDeviceUnit * pSize[i].Height / scale * 100);
+	}
+}
+
+void UICoordinateHelper::LPtoDP( RECT* pRects, int count, int scale/*=100*/ ) const
+{
+	for(int i = 0; i< count; i++)
 	{
 		pRects[i].left= static_cast<int>(pRects[i].left / HorizontalLmPerDeviceUnit * scale / 100); 
 		pRects[i].right= static_cast<int>(pRects[i].right / HorizontalLmPerDeviceUnit * scale / 100); 
 		pRects[i].top= static_cast<int>(pRects[i].top / VerticalLmPerDeviceUnit * scale / 100);
 		pRects[i].bottom= static_cast<int>(pRects[i].bottom / VerticalLmPerDeviceUnit * scale / 100);
 	}
-	return i;
 }
 
-int UICoordinateHelper::LPtoDP( POINT* pPoints, int count, int scale/*=100*/ ) const
+void UICoordinateHelper::LPtoDP(Gdiplus::Rect* pRects, int count, int scale) const
+{
+	for(int i = 0; i< count; i++)
+	{
+		pRects[i].X= static_cast<int>(pRects[i].X / HorizontalLmPerDeviceUnit * scale / 100); 
+		pRects[i].Width= static_cast<int>(pRects[i].Width / HorizontalLmPerDeviceUnit * scale / 100); 
+		pRects[i].Y= static_cast<int>(pRects[i].Y / VerticalLmPerDeviceUnit * scale / 100);
+		pRects[i].Height= static_cast<int>(pRects[i].Height / VerticalLmPerDeviceUnit * scale / 100);
+	}
+}
+
+void UICoordinateHelper::LPtoDP( POINT* pPoints, int count, int scale/*=100*/ ) const
 {
 	for (int i = 0; i< count; i++)
 	{
 		pPoints[i].x= static_cast<int>(pPoints[i].x / HorizontalLmPerDeviceUnit * scale / 100);
 		pPoints[i].y= static_cast<int>(pPoints[i].y / VerticalLmPerDeviceUnit * scale / 100);
 	}
-	return 0;
 }
 
-int UICoordinateHelper::LPtoDP( SIZE* pSize, int count , int scale/*=100*/ ) const
+void UICoordinateHelper::LPtoDP(Gdiplus::Point* pPoints, int count, int scale) const
+{
+	for (int i = 0; i< count; i++)
+	{
+		pPoints[i].X= static_cast<int>(pPoints[i].X / HorizontalLmPerDeviceUnit * scale / 100);
+		pPoints[i].Y= static_cast<int>(pPoints[i].Y / VerticalLmPerDeviceUnit * scale / 100);
+	}
+}
+
+void UICoordinateHelper::LPtoDP( SIZE* pSize, int count , int scale/*=100*/ ) const
 {
 	for (int i = 0; i< count; i++)
 	{
 		pSize[i].cx= static_cast<int>(pSize[i].cx / HorizontalLmPerDeviceUnit * scale / 100);
 		pSize[i].cy= static_cast<int>(pSize[i].cy / VerticalLmPerDeviceUnit * scale / 100);
 	}
-	return 0;
-
 }
+
+void UICoordinateHelper::LPtoDP(Gdiplus::Size* pSize, int count, int scale) const
+{
+	for (int i = 0; i< count; i++)
+	{
+		pSize[i].Width= static_cast<int>(pSize[i].Width / HorizontalLmPerDeviceUnit * scale / 100);
+		pSize[i].Height= static_cast<int>(pSize[i].Height / VerticalLmPerDeviceUnit * scale / 100);
+	}
+}
+
 int UICoordinateHelper::DHLtoLHL( int length /*in 0.1 mm unit*/, int scale/*=100*/ ) const
 {
 	return static_cast<int>(length * HorizontalLmPerDeviceUnit / scale * 100);
