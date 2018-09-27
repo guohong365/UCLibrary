@@ -29,3 +29,4 @@
 #include <windows.h>
 
 #include <GdiPlus.h>
+#define _CRT_SECURE_NO_WARNINGS

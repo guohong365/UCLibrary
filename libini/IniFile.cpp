@@ -5,6 +5,58 @@
 #define LEN_ARGB_COLOR_VALUE 9
 #define LEN_RGB_COLOR_VALUE 7
 
+ConfigItem::~ConfigItem()
+{
+}
+
+void DeletePtr::operator()(ConfigItem* ptr) const
+{
+	delete ptr;
+}
+
+ConfigItemImpl::ConfigItemImpl()
+{
+	ItemName[0] = Value[0] = Comment[0] = 0;
+	Type = TYPE_ITEM;
+}
+
+void ConfigItemImpl::Dump(FILE* fp)
+{
+	_ftprintf(fp, _T("%s\t=%s\t%s\n"), ItemName, Value, Comment);
+}
+
+ConfigSection::ConfigSection()
+{
+	SectionName[0] = Comment[0] = 0;
+	Type = TYPE_SECTION;
+}
+
+ConfigSection::~ConfigSection()
+{
+	std::for_each(Items.begin(), Items.end(), DeletePtr());
+	Items.clear();
+}
+
+void ConfigSection::Dump(FILE* fp)
+{
+	_ftprintf(fp, _T("\n[%s]\t%s\n"), SectionName, Comment);
+	for (size_t i = 0; i < Items.size(); i++)
+	{
+		Items[i]->Dump(fp);
+	}
+}
+
+ConfigComment::ConfigComment()
+{
+	Comment[0] = 0;
+	Type = TYPE_COMMENT;
+}
+
+void ConfigComment::Dump(FILE* fp)
+{
+	_ftprintf(fp, _T("%s\n"), Comment);
+}
+
 int IniFile::isSection(const TCHAR *buf)
 {
 	if(buf[0]==_T('['))
@@ -265,7 +317,7 @@ double IniFile::GetConfigDouble(const TCHAR *section, const TCHAR *itemName, dou
 	return defaultV;
 }
 bool parseHexToLow4Bits(const TCHAR c, unsigned char &outChar)
-{
+{	
 	if(c >= _T('0') && c <= _T('9'))
 	{
 		outChar |= c-_T('0');
@@ -285,6 +337,7 @@ bool parseHexToLow4Bits(const TCHAR c, unsigned char &outChar)
 }
 bool parseHexChar(const TCHAR*buffer, unsigned char &outChar)
 {
+	outChar=0;
 	if(parseHexToLow4Bits(buffer[0], outChar))
 	{
 		outChar <<= 4;
@@ -299,18 +352,19 @@ unsigned int parseColor(const TCHAR* buffer, unsigned int defaultV)
 	if(len!= LEN_ARGB_COLOR_VALUE && len!=LEN_RGB_COLOR_VALUE) return defaultV;
 	unsigned char a, r, g, b;
 	int index=0;
+	const TCHAR *p=buffer + 1;
 	if(len==LEN_RGB_COLOR_VALUE)
 	{
 		a=0xFF;
 	}
 	else
 	{
-		if(!parseHexChar(buffer, a)) return defaultV;
+		if(!parseHexChar(p, a)) return defaultV;
 		index += 2;
 	}
-	if(!parseHexChar(buffer + index, r)) return defaultV;
-	if(!parseHexChar(buffer + index + 2, g)) return defaultV;
-	if(!parseHexChar(buffer + index + 4, b)) return defaultV;
+	if(!parseHexChar(p + index, r)) return defaultV;
+	if(!parseHexChar(p + index + 2, g)) return defaultV;
+	if(!parseHexChar(p + index + 4, b)) return defaultV;
 	return (a << 24)|(r << 16)|(g << 8)|b;
 }
 unsigned long IniFile::GetConfigColor(const TCHAR* section, const TCHAR* itemName, unsigned long defaultV)
@@ -321,6 +375,17 @@ unsigned long IniFile::GetConfigColor(const TCHAR* section, const TCHAR* itemNam
 		return parseColor(pConfig->Value, defaultV);
 	}
 	return defaultV;
+}
+
+bool IniFile::GetConfigBool(const TCHAR* section, const TCHAR* itemName, bool defaultV)
+{
+	TCHAR buffer[20];
+	GetConfigString(section, itemName, _T(""), buffer, 20);
+	if(defaultV)
+	{
+		return !(_tcsicmp(buffer, _T("否"))==0 || _tcsicmp(buffer, _T("no"))==0 || _tcsicmp(buffer, _T("false"))==0 || _tcsicmp(buffer, _T("0"))==0);
+	}
+	return (_tcsicmp(buffer, _T("是"))==0 || _tcsicmp(buffer, _T("yes"))==0 || _tcsicmp(buffer, _T("true"))==0 || _tcsicmp(buffer, _T("1"))==0);
 }
 
 long IniFile::GetConfigSection(TCHAR *buffer, long bufferLen)
@@ -535,3 +600,261 @@ long IniFile::GetSectionNum()
 	return count;
 }
 
+static bool parseScopeInt(const TCHAR* buffer, size_t buf_len, ValueScopeInt& scope)
+{
+	if(buffer[0]!=_T('(') || buffer[buf_len-1]!=_T(')')) return false;
+	const TCHAR* p=buffer;
+	size_t index = 1;
+	const size_t lowStart=index;
+	size_t lowEnd=0;
+	size_t highStart=0;
+	size_t highEnd=0;
+	if(p[index]==_T('-') || p[index]==_T('+'))
+	{
+		index++; //skip sign
+	}
+	//scan buffer
+	int stage= 0;  //0 低值，1 低值结束，2 高值起始，3 高值结束
+	while(index < buf_len)
+	{
+		switch (stage)
+		{
+		case 0:
+			if(p[index] >= _T('0') && p[index] <= _T('9'))
+			{
+				index++;
+				continue;
+			}
+			if(p[index]==_T(' ')) //标记低值结束, 转到state 1 跳过空格并期望第一部分结束符','
+			{
+				lowEnd = index;
+				stage =1;
+				index ++;
+				continue;
+			}
+			if(p[index]==_T(',')) //结束第一部分，直接转入扫描第二部分 stage 2
+			{
+				lowEnd=index;
+				stage = 2;
+				index ++;
+				continue;
+			}
+			return false;
+		case 1:  
+			if(p[index]==_T(' ')) //跳过第一部分后部空格
+			{
+				index++;
+				continue;
+			}
+			if(p[index]==_T(',')) //转入第二部分扫描判断
+			{
+				stage = 2;
+				index ++;
+				continue;
+			}
+			return false;
+		case 2:
+			if(p[index]==_T(' ')) //跳过第二部分前导空格
+			{
+				index ++;
+				continue;
+			}
+			if(p[index]==_T('+') || p[index]==_T('-')) //标记第二部分起始位置，进入stage 3 并期望数字
+			{
+				highStart = index;
+				stage = 3;
+				index ++;
+				continue;
+			}
+			if(p[index] >= _T('0') && p[index] <= _T('9')) //无符号，直接进入stage 3
+			{
+				highStart=index;
+				stage=3;
+				index ++;
+				continue;
+			}
+			return false;
+		case 3:
+			if(p[index] >= _T('0') && p[index] <= _T('9'))
+			{
+				index++;
+				continue;
+			} 
+			highEnd = index; //标记第二部分结束
+			break;
+		}
+		if(highEnd!=0) break; //两部分扫描结束，跳出循环
+	}
+	//判断两部分起止位置逻辑关系，确定是否成功
+	if(lowEnd < lowStart || highEnd < highStart) return false;
+	
+	//转换
+	scope.LowValue = _ttol(p + lowStart);
+	scope.HighValue= _ttol(p + highStart);
+	return true;
+}
+ValueScopeInt IniFile::GetConfigValueScopeInt(const TCHAR* section, const TCHAR* item, const ValueScopeInt& defaultV)
+{
+	ValueScopeInt scope;
+	ConfigItemImpl * pConfig=findItem(section, item);
+	
+	if(pConfig)
+	{
+		const size_t len=_tcslen(pConfig->Value);
+		if(len>4 && parseScopeInt(pConfig->Value, len, scope))
+		{
+			return scope;
+		}
+	}
+	return defaultV;
+}
+static bool parseScopeDouble(const TCHAR* buffer, size_t buf_len, ValueScopeDouble& scope)
+{
+	if(buffer[0]!=_T('(') || buffer[buf_len-1]!=_T(')')) return false;
+	const TCHAR* p=buffer;
+	size_t index = 1;
+	const size_t lowStart=index;
+	size_t lowEnd=0;
+	size_t highStart=0;
+	size_t highEnd=0;
+	if(p[index]==_T('-') || p[index]==_T('+'))
+	{
+		index++; //skip sign
+	}
+	//scan buffer
+	int stage= 0;  //0 低值整数部分，1 低值小数 2 低值结束， 3 高值起始， 4 高值整数 5高值小数 6 高值结束
+	while(index < buf_len)
+	{
+		switch (stage)
+		{
+		case 0://扫描低值整数部分
+			if(p[index] >= _T('0') && p[index] <= _T('9'))
+			{
+				index++;
+				continue;
+			}
+			if(p[index]==_T('.'))
+			{
+				index ++;
+				stage = 1;   //扫描小数部分
+				continue;
+			}
+			if(p[index]==_T(' ')) //标记低值扫描结束, 转到扫描低值束符','
+			{
+				if(lowEnd==0) lowEnd = index;
+				stage =2;
+				index ++;
+				continue;
+			}
+			if(p[index]==_T(',')) //标记低值扫描结束，直接转入高值扫描
+			{
+				if(lowEnd==0) lowEnd=index;
+				stage = 2;
+				index ++;
+				continue;
+			}
+			return false;
+		case 1: //扫描低值小数部分
+			if(p[index] >= _T('0') && p[index] <= _T('9'))
+			{
+				index++;
+				continue;
+			}
+			if(p[index]==_T(' ')) //无小数部分，标记低值扫描结束
+			{
+				lowEnd=index;
+				stage = 2;
+				index++;
+				continue;
+			}
+			if(p[index]==_T(',')) //转入高值扫描判断
+			{
+				lowEnd = index;
+				stage = 3;
+				index ++;
+				continue;
+			}
+			return false;
+		case 2: //扫描低值结束符','
+			if(p[index] == _T(' ')) //跳过低值后部空格
+			{
+				index ++;
+				continue;
+			}
+			if(p[index]==_T(',')) //低值结束，扫描高值
+			{
+				index++;
+				stage = 3;
+				continue;
+			}
+			return false;
+		case 3: //扫描高值整数起始位置
+			if(p[index]==_T(' ')) //跳过高值前导空格
+			{
+				index ++;
+				continue;
+			}
+			if(p[index]==_T('+') || p[index]==_T('-')) //标记高值扫描起始，进入高值整数部分扫描stage 4
+			{
+				highStart = index;
+				stage = 4;
+				index ++;
+				continue;
+			}
+			if(p[index] >= _T('0') && p[index] <= _T('9')) //无符号，标记高值扫描起始，直接进入高值整数部分扫描stage 4
+			{
+				highStart=index;
+				stage=4;
+				index ++;
+				continue;
+			}
+			return false;
+		case 4: //扫描高值整数
+			if(p[index] >= _T('0') && p[index] <= _T('9'))
+			{
+				index++;
+				continue;
+			}
+			if(p[index] == _T('.')) //扫描高值小数部分
+			{
+				index++;
+				stage = 5;
+				continue;
+			}
+			highEnd = index; //标记高值扫描结束
+			break;
+		case 5:
+			if(p[index] >= _T('0') && p[index] <= _T('9'))
+			{
+				index++;
+				continue;
+			}
+			highEnd = index; //标记高值扫描结束
+			break;
+		}
+		if(highEnd!=0) break; //两部分扫描结束，跳出循环
+	}
+	//判断两部分起止位置逻辑关系，确定是否成功
+	if(lowEnd < lowStart || highEnd < highStart) return false;
+	
+	//转换
+	scope.LowValue = _ttof(p + lowStart);
+	scope.HighValue= _ttof(p + highStart);
+	return true;
+}
+ValueScopeDouble IniFile::GetConfigValueScopeDouble(const TCHAR* section, const TCHAR* item,
+	const ValueScopeDouble& defaultV)
+{
+	ValueScopeDouble scope;
+	ConfigItemImpl * pConfig=findItem(section, item);
+	
+	if(pConfig)
+	{
+		const size_t len=_tcslen(pConfig->Value);
+		if(len>4 && parseScopeDouble(pConfig->Value, len, scope))
+		{
+			return scope;
+		}
+	}
+	return defaultV;
+}

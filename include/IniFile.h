@@ -13,6 +13,18 @@
 #define LEN_CFG_ITEM_NAME 256
 #define LEN_CFG_SECTION_NAME 256
 
+struct ValueScopeInt
+{
+	long LowValue;
+	long HighValue;
+};
+
+struct ValueScopeDouble
+{
+	double LowValue;
+	double HighValue;
+};
+
 
 /**Ini项类型*/
 enum ConfigItemType
@@ -32,13 +44,13 @@ struct LIB_UC_API ConfigItem
 	@param fp 已打开的文件指针
 	*/
 	virtual void Dump(FILE *fp)=0;
-	virtual ~ConfigItem(){}
+	virtual ~ConfigItem();
 };
 
 class LIB_UC_API DeletePtr
 {
 public:
-	void operator()(ConfigItem* ptr) const {delete ptr;}
+	void operator()(ConfigItem* ptr) const;
 };
 /**值项目
 */
@@ -47,15 +59,8 @@ struct LIB_UC_API ConfigItemImpl: ConfigItem
 	TCHAR ItemName[LEN_CFG_ITEM_NAME+1];//!<变量名
 	TCHAR Value[LEN_CFG_MAX_STRING+1];//!<值
 	TCHAR Comment[LEN_CFG_MAX_STRING+1];//!<注释
-	ConfigItemImpl()
-	{
-		ItemName[0]=Value[0]=Comment[0]=0;
-		Type=TYPE_ITEM;
-	};
-	virtual void Dump(FILE *fp)
-	{
-		_ftprintf(fp, _T("%s\t=%s\t%s\n"), ItemName, Value, Comment);
-	}
+	ConfigItemImpl();;
+	virtual void Dump(FILE* fp);
 };
 
 /**节项目
@@ -68,24 +73,11 @@ struct LIB_UC_API ConfigSection: ConfigItem
 	TCHAR SectionName[LEN_CFG_SECTION_NAME+1]; //!<节名
 	TCHAR Comment[LEN_CFG_MAX_STRING+1]; //!<注释
 	std::vector<ConfigItem *> Items; //!该节下所有变量的链表
-	ConfigSection()
-	{
-		SectionName[0]=Comment[0]=0;
-		Type=TYPE_SECTION;
-	}
-	~ConfigSection()
-	{
-		std::for_each(Items.begin(), Items.end(), DeletePtr());
-		Items.clear();
-	}
-	virtual void Dump(FILE *fp)
-	{
-		_ftprintf(fp, _T("\n[%s]\t%s\n"), SectionName, Comment);
-		for(size_t i=0; i<Items.size(); i++)
-		{
-			Items[i]->Dump(fp);
-		}
-	}
+	ConfigSection();
+
+	~ConfigSection();
+
+	virtual void Dump(FILE* fp);
 };
 
 /**纯注释项目
@@ -93,15 +85,9 @@ struct LIB_UC_API ConfigSection: ConfigItem
 struct LIB_UC_API ConfigComment: ConfigItem
 {
 	TCHAR Comment[LEN_CFG_MAX_STRING+1];//!<注释
-	ConfigComment()
-	{
-		Comment[0]=0;
-		Type=TYPE_COMMENT;
-	}
-	virtual void Dump(FILE *fp)
-	{
-		_ftprintf(fp, _T("%s\n"), Comment);
-	}
+	ConfigComment();
+
+	virtual void Dump(FILE* fp);
 };
 
 
@@ -248,6 +234,34 @@ public:
 	 */
 	unsigned long GetConfigColor(const TCHAR*section, const TCHAR* itemName, unsigned long defaultV);
 
+	/** 获取配置项布尔值
+	 *
+	 * 配置项为"是","yes","true","1"时，返回 true；配置项为"否","no","false","0"时，返回 false
+	 * @param section 节名
+	 * @param itemName 配置变量名
+	 * @param defaultV 默认值
+	 * @return 返回配置项代表的布尔值。格式错误或未配置，返回默认值
+	 */
+	bool GetConfigBool(const TCHAR*section, const TCHAR*itemName, bool defaultV);
+
+	/**获取整数范围
+	 *
+	 *范围值用","号分隔
+	 * @param section 节名
+	 * @param itemName 配置变量名
+	 * @param defaultV 默认值
+	 * @return 返回配置项代表的布尔值。格式错误或未配置，返回默认值
+	 */
+	ValueScopeInt GetConfigValueScopeInt(const TCHAR* section, const TCHAR* item,const ValueScopeInt& defaultV);
+	/**获取小数范围
+	 *
+	 *范围值用","号分隔
+	 * @param section 节名
+	 * @param itemName 配置变量名
+	 * @param defaultV 默认值
+	 * @return 返回配置项代表的布尔值。格式错误或未配置，返回默认值
+	 */
+	ValueScopeDouble GetConfigValueScopeDouble(const TCHAR* section, const TCHAR* item,const ValueScopeDouble& defaultV);
 
 	/**获取给定ini文件下顺序SECTION值到BUFFER； 
 	 *
