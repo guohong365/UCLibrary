@@ -56,10 +56,10 @@ LIB_UC_API bool Digital2BCD(unsigned __int64 digital, void * pBCD, size_t size);
  *@remark 该函数未检查结果溢出情况，size过大时可能造成数字上溢
  */
 LIB_UC_API bool BCD2Digital(const void* pBCD, size_t size, unsigned __int64 & result);
-LIB_UC_API bool BCD2String(const BYTE * pBCD, size_t size, char *buffer, size_t length);
-LIB_UC_API bool String2BCD(const char * buffer, BYTE * pBCD, size_t size);
-LIB_UC_API bool Bin2HEXString(const BYTE * bin, size_t size, char *str, size_t length);
-LIB_UC_API bool HEXString2Bin(const char * str, BYTE * bin, size_t size);
+LIB_UC_API bool BCD2String(const unsigned char * pBCD, size_t size, char *buffer, size_t length);
+LIB_UC_API bool String2BCD(const char * buffer, unsigned char * pBCD, size_t size);
+LIB_UC_API bool Bin2HEXString(const unsigned char * bin, size_t size, char *str, size_t length);
+LIB_UC_API bool HEXString2Bin(const char * str, unsigned char * bin, size_t size);
 LIB_UC_API void genRandomHEXString(char * pwd, size_t length);
 LIB_UC_API bool StringDigitalToChChar(const TCHAR *text, TCHAR * output, size_t length);
 LIB_UC_API bool DigitalToChChar(long digital, TCHAR* output, size_t size);

@@ -10,4 +10,5 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <conio.h>
-#include <IniFile.h>
+#include <libUC.h>
+#include <libini.h>
